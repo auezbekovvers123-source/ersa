@@ -8,8 +8,6 @@ Express + `db.json` file storage. Passwords are **never stored plain text**: reg
 cd server
 npm install
 npm start
-lolle
-
 ```
 
 Default: **http://localhost:3000**  
@@ -26,9 +24,9 @@ CORS is enabled for browser requests from your Vite dev server.
 | **One-to-many** (not user–role) | **Category → products** via `product.categoryId`. **User → orders** via `order.userId` |
 | **CRUD** (create, read all, read one by id, update, delete) | See tables below — each resource exposes all five operations where it makes sense |
 
-**Users — create:** use **`POST /register`** (creates a user with a hashed password). A generic `POST /users` with a plain body would contradict the “hashed password” rule, so creation is only through register.
+**Users — create:** **`POST /register`** or **`POST /users`** — both hash the password with bcrypt before saving.
 
-**Users — read / delete:** `GET /users`, `GET /users/:id`, `DELETE /users/:id` (responses **never** include `password`).
+**Users — read / update / delete:** `GET /users`, `GET /users/:id`, `PUT /users/:id`, `DELETE /users/:id`. Change password: `PATCH /users/:id/password` with `currentPassword` and `newPassword`. Responses **never** include `password`.
 
 ---
 
@@ -61,7 +59,10 @@ JSON bodies: `Content-Type: application/json`
 |--------|------|--------|
 | GET | `/users` | list |
 | GET | `/users/:id` | one |
-| DELETE | `/users/:id` | delete |
+| POST | `/users` | body `email`, `password`, `name?` (hashed like register) |
+| PUT | `/users/:id` | body `name?`, `email?` |
+| PATCH | `/users/:id/password` | body `currentPassword`, `newPassword` |
+| DELETE | `/users/:id` | also removes that user’s orders |
 
 ### Categories
 
