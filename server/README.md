@@ -8,6 +8,8 @@ Express + `db.json` file storage. Passwords are **never stored plain text**: reg
 cd server
 npm install
 npm start
+lolle
+
 ```
 
 Default: **http://localhost:3000**  
