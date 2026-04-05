@@ -1,0 +1,24 @@
+{
+  "users": [],
+  "categories": [
+    { "id": 1, "name": "Electronics" },
+    { "id": 2, "name": "Books" }
+  ],
+  "products": [
+    {
+      "id": 1,
+      "name": "Demo phone",
+      "price": 599,
+      "categoryId": 1,
+      "description": "Sample product"
+    },
+    {
+      "id": 2,
+      "name": "React guide",
+      "price": 29,
+      "categoryId": 2,
+      "description": "Sample book"
+    }
+  ],
+  "orders": []
+}
