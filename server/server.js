@@ -33,27 +33,33 @@ function userPublic(u) {
   return rest;
 }
 
+async function insertUser(db, { email, password, name }) {
+  if (!email || !password) {
+    return { status: 400, body: { error: "email and password required" } };
+  }
+  const em = String(email).trim();
+  if (db.users.some((u) => u.email === em)) {
+    return { status: 409, body: { error: "email already registered" } };
+  }
+  const hash = await bcrypt.hash(String(password), 10);
+  const user = {
+    id: nextId(db.users),
+    email: em,
+    name: name != null ? String(name).trim() : "",
+    password: hash,
+  };
+  db.users.push(user);
+  return { user };
+}
+
 // ---------- Auth (passwords stored hashed with bcrypt) ----------
 app.post("/register", async (req, res) => {
   try {
-    const { email, password, name } = req.body || {};
-    if (!email || !password) {
-      return res.status(400).json({ error: "email and password required" });
-    }
     const db = readDb();
-    if (db.users.some((u) => u.email === email)) {
-      return res.status(409).json({ error: "email already registered" });
-    }
-    const hash = await bcrypt.hash(password, 10);
-    const user = {
-      id: nextId(db.users),
-      email: String(email).trim(),
-      name: name ? String(name).trim() : "",
-      password: hash,
-    };
-    db.users.push(user);
+    const out = await insertUser(db, req.body || {});
+    if (out.status) return res.status(out.status).json(out.body);
     writeDb(db);
-    return res.status(201).json({ user: userPublic(user) });
+    return res.status(201).json({ user: userPublic(out.user) });
   } catch (e) {
     console.error(e);
     return res.status(500).json({ error: "server error" });
@@ -91,10 +97,66 @@ app.get("/users/:id", (req, res) => {
   res.json(userPublic(u));
 });
 
+app.post("/users", async (req, res) => {
+  try {
+    const db = readDb();
+    const out = await insertUser(db, req.body || {});
+    if (out.status) return res.status(out.status).json(out.body);
+    writeDb(db);
+    return res.status(201).json(userPublic(out.user));
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({ error: "server error" });
+  }
+});
+
+app.put("/users/:id", (req, res) => {
+  const db = readDb();
+  const u = db.users.find((x) => String(x.id) === String(req.params.id));
+  if (!u) return res.status(404).json({ error: "not found" });
+  const { name, email } = req.body || {};
+  if (email != null) {
+    const em = String(email).trim();
+    if (db.users.some((x) => x.id !== u.id && x.email === em)) {
+      return res.status(409).json({ error: "email already in use" });
+    }
+    u.email = em;
+  }
+  if (name != null) u.name = String(name).trim();
+  writeDb(db);
+  res.json(userPublic(u));
+});
+
+app.patch("/users/:id/password", async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body || {};
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ error: "currentPassword and newPassword required" });
+    }
+    if (String(newPassword).length < 6) {
+      return res.status(400).json({ error: "newPassword must be at least 6 characters" });
+    }
+    const db = readDb();
+    const u = db.users.find((x) => String(x.id) === String(req.params.id));
+    if (!u) return res.status(404).json({ error: "not found" });
+    if (!(await bcrypt.compare(String(currentPassword), u.password))) {
+      return res.status(401).json({ error: "invalid current password" });
+    }
+    u.password = await bcrypt.hash(String(newPassword), 10);
+    writeDb(db);
+    res.json({ ok: true });
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({ error: "server error" });
+  }
+});
+
 app.delete("/users/:id", (req, res) => {
   const db = readDb();
-  const idx = db.users.findIndex((x) => String(x.id) === String(req.params.id));
+  const idStr = String(req.params.id);
+  const idx = db.users.findIndex((x) => String(x.id) === idStr);
   if (idx === -1) return res.status(404).json({ error: "not found" });
+  db.orders = db.orders.filter((o) => String(o.userId) !== idStr);
   const [removed] = db.users.splice(idx, 1);
   writeDb(db);
   res.json(userPublic(removed));
@@ -135,8 +197,14 @@ app.put("/categories/:id", (req, res) => {
 
 app.delete("/categories/:id", (req, res) => {
   const db = readDb();
-  const idx = db.categories.findIndex((x) => String(x.id) === String(req.params.id));
+  const cid = Number(req.params.id);
+  const idx = db.categories.findIndex((x) => Number(x.id) === cid);
   if (idx === -1) return res.status(404).json({ error: "not found" });
+  if (db.products.some((p) => p.categoryId != null && Number(p.categoryId) === cid)) {
+    return res.status(409).json({
+      error: "category has products; reassign or delete products first",
+    });
+  }
   const [removed] = db.categories.splice(idx, 1);
   writeDb(db);
   res.json(removed);
@@ -261,5 +329,4 @@ app.delete("/orders/:id", (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`API http://localhost:${PORT}`);
-  console.log("Auth: POST /register, POST /login (passwords hashed with bcrypt in db.json)");
 });
