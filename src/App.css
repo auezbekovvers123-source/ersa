@@ -1,12 +1,112 @@
 .app {
-  min-height: 100%;
+  flex: 1;
   display: flex;
   flex-direction: column;
+  min-height: 0;
 }
 
 .app-header {
   padding: 1.5rem 0;
   border-bottom: 1px solid var(--border);
+}
+
+.app-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  margin-top: 1rem;
+  font-size: 0.95rem;
+}
+
+.app-nav a {
+  color: var(--text-heading);
+  text-decoration: none;
+}
+
+.app-nav a:hover {
+  text-decoration: underline;
+}
+
+.app-nav a.active {
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.app-nav-user {
+  margin-left: auto;
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.app-nav-btn {
+  font: inherit;
+  cursor: pointer;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-heading);
+}
+
+.app-nav-btn:hover {
+  border-color: var(--text);
+}
+
+.stack-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 22rem;
+}
+
+.stack-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+}
+
+.stack-form input {
+  font: inherit;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: inherit;
+}
+
+.stack-form button[type='submit'] {
+  font: inherit;
+  cursor: pointer;
+  margin-top: 0.25rem;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: none;
+  background: var(--text-heading);
+  color: var(--bg);
+}
+
+.optional {
+  font-weight: 400;
+  color: var(--text);
+}
+
+.form-error {
+  margin: 0;
+  color: #b91c1c;
+  font-size: 0.9rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .form-error {
+    color: #fca5a5;
+  }
+
+  .stack-form button[type='submit'] {
+    background: #e5e7eb;
+    color: #111827;
+  }
 }
 
 .app-title {
@@ -24,4 +124,29 @@
 .app-main {
   flex: 1;
   padding: 1.5rem 0;
+  min-height: 12rem;
+}
+
+.home-heading {
+  margin-top: 0;
+}
+
+.home-links {
+  margin: 1rem 0 0;
+  font-size: 1rem;
+}
+
+.muted {
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.resource-list {
+  margin: 0;
+  padding-left: 1.25rem;
+  line-height: 1.6;
+}
+
+.resource-list li {
+  margin-bottom: 0.35rem;
 }

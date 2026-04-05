@@ -1,18 +1,30 @@
+import { Navigate, Route, Routes } from 'react-router-dom'
 import './App.css'
+import Layout from './components/Layout.jsx'
+import CategoriesPage from './pages/CategoriesPage.jsx'
+import HomePage from './pages/HomePage.jsx'
+import LoginPage from './pages/LoginPage.jsx'
+import OrdersPage from './pages/OrdersPage.jsx'
+import ProductDetailPage from './pages/ProductDetailPage.jsx'
+import ProductsPage from './pages/ProductsPage.jsx'
+import RegisterPage from './pages/RegisterPage.jsx'
+import UsersPage from './pages/UsersPage.jsx'
 
 function App() {
   return (
-    <div className="app">
-      <header className="app-header">
-        <h1 className="app-title">LESGO 100% Team Project</h1>
-        <p className="app-lead">
-          Add React Router, auth Context, and CRUD pages here. API: run{' '}
-          <code>npm start</code> in <code>server/</code> (default{' '}
-          <code>http://localhost:3000</code>).
-        </p>
-      </header>
-      <main className="app-main" />
-    </div>
+    <Routes>
+      <Route path="/" element={<Layout />}>
+        <Route index element={<HomePage />} />
+        <Route path="login" element={<LoginPage />} />
+        <Route path="register" element={<RegisterPage />} />
+        <Route path="products" element={<ProductsPage />} />
+        <Route path="products/:id" element={<ProductDetailPage />} />
+        <Route path="categories" element={<CategoriesPage />} />
+        <Route path="orders" element={<OrdersPage />} />
+        <Route path="users" element={<UsersPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Route>
+    </Routes>
   )
 }
 

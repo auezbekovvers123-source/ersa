@@ -43,11 +43,27 @@ body {
   max-width: 960px;
   margin: 0 auto;
   padding: 0 1.25rem;
+  display: flex;
+  flex-direction: column;
 }
 
-h1 {
+h1,
+h2 {
   font-weight: 600;
   color: var(--text-heading);
+}
+
+h2 {
+  font-size: 1.25rem;
+  margin: 0 0 0.75rem;
+}
+
+a {
+  color: var(--text-heading);
+}
+
+a:hover {
+  text-decoration: underline;
 }
 
 code {
