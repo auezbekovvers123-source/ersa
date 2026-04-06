@@ -13,19 +13,10 @@ export default function Layout() {
             Home
           </NavLink>
           <NavLink to="/products">Products</NavLink>
-          {user ? (
-            <>
-              <span className="app-nav-user">{user.email}</span>
-              <button type="button" className="app-nav-btn" onClick={logout}>
-                Log out
-              </button>
-            </>
-          ) : (
-            <>
-              <NavLink to="/login">Log in</NavLink>
-              <NavLink to="/register">Register</NavLink>
-            </>
-          )}
+          <span className="app-nav-user">{user?.email}</span>
+          <button type="button" className="app-nav-btn" onClick={logout}>
+            Log out
+          </button>
         </nav>
       </header>
       <main className="app-main">

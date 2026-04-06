@@ -1,20 +1,26 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 
 export default function LoginPage() {
-  const { login } = useAuth()
+  const { user, login } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+
+  if (user) {
+    return <Navigate to="/" replace />
+  }
 
   async function handleSubmit(e) {
     e.preventDefault()
     setError('')
     try {
       await login({ email, password })
-      navigate('/')
+      const to = location.state?.from?.pathname || '/'
+      navigate(to, { replace: true })
     } catch (err) {
       setError(err.body?.error || err.message || 'Login failed')
     }
