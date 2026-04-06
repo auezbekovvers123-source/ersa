@@ -67,13 +67,20 @@
   font-size: 0.9rem;
 }
 
-.stack-form input {
+.stack-form input,
+.stack-form select,
+.stack-form textarea {
   font: inherit;
   padding: 0.5rem 0.65rem;
   border: 1px solid var(--border);
   border-radius: 6px;
   background: var(--bg);
   color: inherit;
+}
+
+.stack-form textarea {
+  resize: vertical;
+  min-height: 4rem;
 }
 
 .stack-form button[type='submit'] {
@@ -149,4 +156,59 @@
 
 .resource-list li {
   margin-bottom: 0.35rem;
+}
+
+.product-form {
+  max-width: 28rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.form-section-title {
+  margin: 0 0 0.75rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-heading);
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  margin-top: 0.5rem;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.data-table th,
+.data-table td {
+  text-align: left;
+  padding: 0.5rem 0.65rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.data-table th {
+  color: var(--text-heading);
+  font-weight: 600;
+}
+
+.data-table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.app-nav-btn.danger:hover {
+  border-color: #b91c1c;
+  color: #b91c1c;
 }

@@ -250,12 +250,16 @@ app.put("/products/:id", (req, res) => {
   const { name, price, categoryId, description } = req.body || {};
   if (name != null) p.name = String(name).trim();
   if (price != null) p.price = Number(price);
-  if (categoryId != null) {
-    const cid = Number(categoryId);
-    if (!db.categories.some((c) => c.id === cid)) {
-      return res.status(400).json({ error: "invalid categoryId" });
+  if (categoryId !== undefined) {
+    if (categoryId == null || categoryId === "") {
+      p.categoryId = null;
+    } else {
+      const cid = Number(categoryId);
+      if (!db.categories.some((c) => c.id === cid)) {
+        return res.status(400).json({ error: "invalid categoryId" });
+      }
+      p.categoryId = cid;
     }
-    p.categoryId = cid;
   }
   if (description != null) p.description = String(description);
   writeDb(db);
