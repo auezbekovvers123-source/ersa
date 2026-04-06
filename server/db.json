@@ -1,23 +1,53 @@
 {
   "users": [],
   "categories": [
-    { "id": 1, "name": "Electronics" },
-    { "id": 2, "name": "Books" }
+    { "id": 1, "name": "Электроника" },
+    { "id": 2, "name": "Книги" },
+    { "id": 3, "name": "Одежда" },
+    { "id": 4, "name": "Аксессуары" }
   ],
   "products": [
     {
       "id": 1,
-      "name": "Demo phone",
+      "name": "Смартфон Nova X",
       "price": 599,
       "categoryId": 1,
-      "description": "Sample product"
+      "description": "6.1\", 128 ГБ, двойная камера"
     },
     {
       "id": 2,
-      "name": "React guide",
+      "name": "Книга «React для начинающих»",
       "price": 29,
       "categoryId": 2,
-      "description": "Sample book"
+      "description": "Практическое введение во фронтенд"
+    },
+    {
+      "id": 3,
+      "name": "Худи оверсайз",
+      "price": 45,
+      "categoryId": 3,
+      "description": "Хлопок 80%, чёрный, размеры S–XL"
+    },
+    {
+      "id": 4,
+      "name": "Кроссовки Urban Run",
+      "price": 89,
+      "categoryId": 3,
+      "description": "Лёгкая подошва, сетка, белый/серый"
+    },
+    {
+      "id": 5,
+      "name": "Рюкзак RollTop 20 л",
+      "price": 52,
+      "categoryId": 4,
+      "description": "Водоотталкивающая ткань, отделение для ноутбука"
+    },
+    {
+      "id": 6,
+      "name": "Настольная лампа LED",
+      "price": 34,
+      "categoryId": 1,
+      "description": "Регулировка яркости, тёплый свет"
     }
   ],
   "orders": []
