@@ -5,24 +5,20 @@ export default function HomePage() {
     <section className="home-section">
       <h2 className="home-heading">Home</h2>
       <p className="app-lead">
-        Use the navigation above or open{' '}
-        <Link to="/categories">Categories</Link> to see data from the API when
-        the server is running.
+        Открой <Link to="/products">Products</Link>, когда запущен API (
+        <code>npm start</code> в <code>server/</code>).
       </p>
       <p className="app-lead">
-        <strong>Run the API:</strong>{' '}
-        <code>cd server</code> then <code>npm start</code> (port{' '}
-        <code>3000</code>). <strong>Run this app:</strong>{' '}
-        <code>npm run dev</code> in the project root.
+        <strong>API:</strong> <code>cd server</code> → <code>npm start</code>{' '}
+        (порт <code>3000</code>). <strong>Фронт:</strong>{' '}
+        <code>npm run dev</code> в корне проекта.
       </p>
       <p className="home-links">
         <Link to="/products">Products</Link>
         <span aria-hidden="true"> · </span>
-        <Link to="/categories">Categories</Link>
+        <Link to="/login">Log in</Link>
         <span aria-hidden="true"> · </span>
-        <Link to="/orders">Orders</Link>
-        <span aria-hidden="true"> · </span>
-        <Link to="/users">Users</Link>
+        <Link to="/register">Register</Link>
       </p>
     </section>
   )

@@ -13,9 +13,6 @@ export default function Layout() {
             Home
           </NavLink>
           <NavLink to="/products">Products</NavLink>
-          <NavLink to="/categories">Categories</NavLink>
-          <NavLink to="/orders">Orders</NavLink>
-          <NavLink to="/users">Users</NavLink>
           {user ? (
             <>
               <span className="app-nav-user">{user.email}</span>
