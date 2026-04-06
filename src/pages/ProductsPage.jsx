@@ -115,8 +115,7 @@ export default function ProductsPage() {
     <section>
       <h2>Products</h2>
       <p className="muted">
-        <strong>CRUD:</strong> Create — форма ниже; Read — таблица; Update —
-        «Изменить»; Delete — «Удалить».
+        <strong>Редактирование удаление и добавление продуктов</strong>
       </p>
 
       {loadError ? <p className="form-error">{loadError}</p> : null}

@@ -5,13 +5,11 @@ export default function HomePage() {
     <section className="home-section">
       <h2 className="home-heading">Home</h2>
       <p className="app-lead">
-        Открой <Link to="/products">Products</Link>, когда запущен API (
-        <code>npm start</code> в <code>server/</code>).
+        Hello! Главная страница!
       </p>
       <p className="app-lead">
-        <strong>API:</strong> <code>cd server</code> → <code>npm start</code>{' '}
-        (порт <code>3000</code>). <strong>Фронт:</strong>{' '}
-        <code>npm run dev</code> в корне проекта.
+        Team: Ерсайын Ауезбеков - Жасулан Бейсембеков - Турлыбай Бауыржан
+
       </p>
       <p className="home-links">
         <Link to="/products">Products</Link>
