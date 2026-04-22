@@ -1,21 +1,18 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { apiJson } from '../api.js'
-
-const emptyForm = {
-  name: '',
-  price: '',
-  categoryId: '',
-  description: '',
-}
+import { useAuth } from '../context/AuthContext.jsx'
+import { addToCart } from '../cartStorage.js'
+import { useNotify } from '../hooks/useNotify.js'
 
 export default function ProductsPage() {
+  const { user } = useAuth()
+  const notify = useNotify()
+  const [search, setSearch] = useState('')
   const [products, setProducts] = useState(null)
   const [categories, setCategories] = useState([])
   const [loadError, setLoadError] = useState('')
-  const [form, setForm] = useState(emptyForm)
-  const [editingId, setEditingId] = useState(null)
-  const [formError, setFormError] = useState('')
-  const [saving, setSaving] = useState(false)
+  const [activeProduct, setActiveProduct] = useState(null)
+  const [quantity, setQuantity] = useState(1)
 
   const refresh = useCallback(async () => {
     setLoadError('')
@@ -28,10 +25,7 @@ export default function ProductsPage() {
       setCategories(Array.isArray(cList) ? cList : [])
     } catch (err) {
       setProducts(null)
-      setLoadError(
-        err.message ||
-          'Не удалось загрузить данные. Запущен ли сервер (порт 3000)?',
-      )
+      setLoadError(err.message || 'Could not load products catalog.')
     }
   }, [])
 
@@ -45,198 +39,102 @@ export default function ProductsPage() {
     return c ? c.name : `#${id}`
   }
 
-  function startEdit(p) {
-    setEditingId(p.id)
-    setForm({
-      name: p.name ?? '',
-      price: p.price != null ? String(p.price) : '',
-      categoryId:
-        p.categoryId != null && p.categoryId !== '' ? String(p.categoryId) : '',
-      description: p.description ?? '',
-    })
-    setFormError('')
+  const filteredProducts = useMemo(
+    () =>
+      (products || []).filter((p) =>
+      String(p.name || '')
+        .toLowerCase()
+        .includes(search.toLowerCase()),
+    ),
+    [products, search],
+  )
+
+  function openProductModal(product) {
+    setActiveProduct(product)
+    setQuantity(1)
   }
 
-  function cancelEdit() {
-    setEditingId(null)
-    setForm(emptyForm)
-    setFormError('')
+  function closeProductModal() {
+    setActiveProduct(null)
+    setQuantity(1)
   }
 
-  async function handleSubmit(e) {
-    e.preventDefault()
-    const name = form.name.trim()
-    if (!name) return
-
-    const body = {
-      name,
-      price: form.price === '' ? 0 : Number(form.price),
-      description: form.description.trim(),
-    }
-    if (form.categoryId === '') body.categoryId = null
-    else body.categoryId = Number(form.categoryId)
-
-    setFormError('')
-    setSaving(true)
-    try {
-      if (editingId == null) {
-        await apiJson('/products', {
-          method: 'POST',
-          body: JSON.stringify(body),
-        })
-      } else {
-        await apiJson(`/products/${editingId}`, {
-          method: 'PUT',
-          body: JSON.stringify(body),
-        })
-      }
-      cancelEdit()
-      await refresh()
-    } catch (err) {
-      setFormError(err.body?.error || err.message || 'Ошибка сохранения')
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  async function handleDelete(id) {
-    if (!window.confirm('Удалить этот товар?')) return
-    setFormError('')
-    try {
-      await apiJson(`/products/${id}`, { method: 'DELETE' })
-      if (editingId === id) cancelEdit()
-      await refresh()
-    } catch (err) {
-      setFormError(err.body?.error || err.message || 'Не удалось удалить')
-    }
+  function handleAddToCart() {
+    if (!activeProduct || !user?.id) return
+    const qty = Math.max(1, Number(quantity) || 1)
+    addToCart(user.id, activeProduct, qty)
+    notify('success', `${activeProduct.name} added to cart`)
+    closeProductModal()
   }
 
   return (
-    <section>
-      <h2>Products</h2>
-      <p className="muted">
-        <strong>Редактирование удаление и добавление продуктов</strong>
-      </p>
+    <section className="catalog-section">
+      <h2>Products Catalog</h2>
+      <p className="muted">Browse products. Only admins can manage product data.</p>
 
       {loadError ? <p className="form-error">{loadError}</p> : null}
+      <label className="search-label">
+        Search products
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Type product name..."
+        />
+      </label>
 
-      <form onSubmit={handleSubmit} className="stack-form product-form">
-        <h3 className="form-section-title">
-          {editingId == null ? 'Новый товар' : `Редактирование #${editingId}`}
-        </h3>
-        <label>
-          Название
-          <input
-            type="text"
-            value={form.name}
-            onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-            required
-            disabled={saving}
-          />
-        </label>
-        <label>
-          Цена
-          <input
-            type="number"
-            min="0"
-            step="0.01"
-            value={form.price}
-            onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))}
-            disabled={saving}
-          />
-        </label>
-        <label>
-          Категория
-          <select
-            value={form.categoryId}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, categoryId: e.target.value }))
-            }
-            disabled={saving}
-          >
-            <option value="">Без категории</option>
-            {categories.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Описание
-          <textarea
-            rows={3}
-            value={form.description}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, description: e.target.value }))
-            }
-            disabled={saving}
-          />
-        </label>
-        {formError ? <p className="form-error">{formError}</p> : null}
-        <div className="form-actions">
-          <button type="submit" disabled={saving}>
-            {saving ? 'Сохранение…' : editingId == null ? 'Создать' : 'Сохранить'}
-          </button>
-          {editingId != null ? (
-            <button
-              type="button"
-              className="app-nav-btn"
-              onClick={cancelEdit}
-              disabled={saving}
-            >
-              Отмена
-            </button>
-          ) : null}
-        </div>
-      </form>
-
-      <h3 className="form-section-title">Список</h3>
       {products === null && !loadError ? (
-        <p className="muted">Загрузка…</p>
+        <p className="muted">Loading...</p>
       ) : null}
-      {products && products.length === 0 ? (
-        <p className="muted">Пока нет товаров.</p>
+      {products !== null && filteredProducts.length === 0 ? (
+        <p className="muted">No products found.</p>
       ) : null}
-      {products && products.length > 0 ? (
-        <div className="table-wrap">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Название</th>
-                <th>Цена</th>
-                <th>Категория</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map((p) => (
-                <tr key={p.id}>
-                  <td>{p.id}</td>
-                  <td>{p.name}</td>
-                  <td>{p.price}</td>
-                  <td>{categoryName(p.categoryId)}</td>
-                  <td className="data-table-actions">
-                    <button
-                      type="button"
-                      className="app-nav-btn"
-                      onClick={() => startEdit(p)}
-                    >
-                      Изменить
-                    </button>
-                    <button
-                      type="button"
-                      className="app-nav-btn danger"
-                      onClick={() => handleDelete(p.id)}
-                    >
-                      Удалить
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {filteredProducts.length > 0 ? (
+        <div className="catalog-grid">
+          {filteredProducts.map((p) => (
+            <article key={p.id} className="product-card">
+              <p className="product-category">{categoryName(p.categoryId)}</p>
+              <h3 className="product-title">{p.name}</h3>
+              <p className="product-description">{p.description || 'No description'}</p>
+              <p className="product-price">${Number(p.price || 0).toFixed(2)}</p>
+              <button
+                type="button"
+                className="app-nav-btn"
+                onClick={() => openProductModal(p)}
+              >
+                View details
+              </button>
+            </article>
+          ))}
+        </div>
+      ) : null}
+
+      {activeProduct ? (
+        <div className="modal-backdrop" role="presentation">
+          <div className="modal-card" role="dialog" aria-modal="true">
+            <h3>{activeProduct.name}</h3>
+            <p className="muted">Category: {categoryName(activeProduct.categoryId)}</p>
+            <p>{activeProduct.description || 'No description'}</p>
+            <p className="product-price">
+              ${Number(activeProduct.price || 0).toFixed(2)}
+            </p>
+            <label className="product-qty-label">
+              Quantity
+              <input
+                type="number"
+                min="1"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+              />
+            </label>
+            <div className="modal-actions">
+              <button type="button" className="app-nav-btn" onClick={closeProductModal}>
+                Close
+              </button>
+              <button type="button" className="app-nav-btn" onClick={handleAddToCart}>
+                Add to cart
+              </button>
+            </div>
+          </div>
         </div>
       ) : null}
     </section>

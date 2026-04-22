@@ -33,7 +33,11 @@ function userPublic(u) {
   return rest;
 }
 
-async function insertUser(db, { email, password, name }) {
+function normalizeRole(role) {
+  return role === "admin" ? "admin" : "user";
+}
+
+async function insertUser(db, { email, password, name, role }) {
   if (!email || !password) {
     return { status: 400, body: { error: "email and password required" } };
   }
@@ -46,6 +50,7 @@ async function insertUser(db, { email, password, name }) {
     id: nextId(db.users),
     email: em,
     name: name != null ? String(name).trim() : "",
+    role: normalizeRole(role),
     password: hash,
   };
   db.users.push(user);
@@ -56,7 +61,10 @@ async function insertUser(db, { email, password, name }) {
 app.post("/register", async (req, res) => {
   try {
     const db = readDb();
-    const out = await insertUser(db, req.body || {});
+    const out = await insertUser(db, {
+      role: "user",
+      ...(req.body || {}),
+    });
     if (out.status) return res.status(out.status).json(out.body);
     writeDb(db);
     return res.status(201).json({ user: userPublic(out.user) });
@@ -114,7 +122,7 @@ app.put("/users/:id", (req, res) => {
   const db = readDb();
   const u = db.users.find((x) => String(x.id) === String(req.params.id));
   if (!u) return res.status(404).json({ error: "not found" });
-  const { name, email } = req.body || {};
+  const { name, email, role } = req.body || {};
   if (email != null) {
     const em = String(email).trim();
     if (db.users.some((x) => x.id !== u.id && x.email === em)) {
@@ -123,6 +131,7 @@ app.put("/users/:id", (req, res) => {
     u.email = em;
   }
   if (name != null) u.name = String(name).trim();
+  if (role != null) u.role = normalizeRole(role);
   writeDb(db);
   res.json(userPublic(u));
 });

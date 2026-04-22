@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useNotify } from '../hooks/useNotify.js'
 
 export default function LoginPage() {
   const { user, login } = useAuth()
@@ -9,6 +10,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const notify = useNotify()
 
   if (user) {
     return <Navigate to="/" replace />
@@ -19,9 +21,11 @@ export default function LoginPage() {
     setError('')
     try {
       await login({ email, password })
+      notify('success', 'Logged in successfully')
       const to = location.state?.from?.pathname || '/'
       navigate(to, { replace: true })
     } catch (err) {
+      notify('error', 'Login failed')
       setError(err.body?.error || err.message || 'Login failed')
     }
   }

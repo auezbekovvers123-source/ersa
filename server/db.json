@@ -1,10 +1,37 @@
 {
-  "users": [],
+  "users": [
+    {
+      "id": 1,
+      "email": "auyezbekov26@mail.ru",
+      "name": "Ersaiyn",
+      "role": "admin",
+      "password": "$2a$10$/CniUTq52Wl4CPt8tLoyu.IwdVJTM4UwtPK1vQOHh7rHwlGDf8LtK"
+    },
+    {
+      "id": 2,
+      "email": "admin@admin.com",
+      "name": "admin master",
+      "role": "admin",
+      "password": "$2a$10$4NJXsk299qBPjqMa0efjU.sNEKKPZ.MUyg1saEh9bjeL4lI8Sg0CS"
+    }
+  ],
   "categories": [
-    { "id": 1, "name": "Электроника" },
-    { "id": 2, "name": "Книги" },
-    { "id": 3, "name": "Одежда" },
-    { "id": 4, "name": "Аксессуары" }
+    {
+      "id": 1,
+      "name": "Электроника"
+    },
+    {
+      "id": 2,
+      "name": "Книги"
+    },
+    {
+      "id": 3,
+      "name": "Одежда"
+    },
+    {
+      "id": 4,
+      "name": "Аксессуары"
+    }
   ],
   "products": [
     {
