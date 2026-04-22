@@ -1,188 +1,92 @@
-# Team Project Final Explanation
+# Финальное описание проекта
 
-This document explains exactly how the project now satisfies all required points:
+Этот документ объясняет, как проект закрывает основные требования:
 
-1. one-to-many relation not based on users + CRUD on both tables,
-2. user roles with protected routing for auth and role,
-3. Redux with two reducers,
-4. notifications for auth + CRUD operations without `alert/confirm/prompt`,
-5. modal confirmation for all delete operations.
+1. связь один-ко-многим не через таблицу пользователей + CRUD для обеих таблиц;
+2. роли пользователей и защита маршрутов по авторизации и роли;
+3. Redux с двумя редьюсерами;
+4. уведомления для auth/CRUD без `alert/confirm/prompt`;
+5. подтверждение удаления через модальное окно.
 
 ---
 
-## 1) Requirements Checklist
+## 1) Чеклист требований
 
-### A. One-to-many relation (not users) + CRUD on both tables
+### A. Связь один-ко-многим (не users) + CRUD по обеим сущностям
 
-Implemented relation:
-- `categories (1) -> products (many)` via `product.categoryId`.
+Реализована связь:
+- `categories (1) -> products (many)` через `product.categoryId`.
 
-Backend CRUD:
-- categories: `GET /categories`, `GET /categories/:id`, `POST /categories`, `PUT /categories/:id`, `DELETE /categories/:id`
-- products: `GET /products`, `GET /products/:id`, `POST /products`, `PUT /products/:id`, `DELETE /products/:id`
+CRUD в backend:
+- категории: `GET /categories`, `GET /categories/:id`, `POST /categories`, `PUT /categories/:id`, `DELETE /categories/:id`
+- продукты: `GET /products`, `GET /products/:id`, `POST /products`, `PUT /products/:id`, `DELETE /products/:id`
 
-Frontend CRUD pages:
-- `src/pages/ProductsPage.jsx` (full CRUD)
-- `src/pages/CategoriesPage.jsx` (full CRUD)
+CRUD в frontend:
+- `src/pages/AdminProductsPage.jsx` (полный CRUD, только для admin)
+- `src/pages/CategoriesPage.jsx` (полный CRUD, только для admin)
+- `src/pages/ProductsPage.jsx` (каталог только для просмотра)
 
-Result: requirement is fully covered on both sides.
+Итог: требование закрыто.
 
-### B. Roles + protected routes by auth and role
+### B. Роли + защита маршрутов
 
-Roles:
-- users now include `role` with at least two values: `admin`, `user`.
-- backend normalizes role in `server/server.js`.
-- existing seed user in `server/db.json` is set to `admin`.
+Роли:
+- у пользователя есть `role` со значениями `admin`/`user`;
+- нормализация роли выполняется в `server/server.js`;
+- в `server/db.json` есть админ-пользователь.
 
-Protection:
-- logged/not logged protection: `src/components/ProtectedRoute.jsx`
-- role protection: same component supports `roles` prop and blocks access if user role is not allowed.
+Защита:
+- защита «вошел/не вошел»: `src/components/ProtectedRoute.jsx`;
+- защита по ролям: тот же компонент через проп `roles`.
 
-Role-based routes:
-- `src/App.jsx`:
-  - `/categories` is protected with `roles={['admin']}`
-  - all internal routes still require login first
+Итог: требование закрыто.
 
-Role-based UI:
-- `src/components/Layout.jsx` and `src/pages/HomePage.jsx` show Categories link only for admin.
+### C. Redux с 2 редьюсерами
 
-Result: requirement is fully covered.
-
-### C. Redux with 2 reducers
-
-Added Redux Toolkit + React Redux.
+Добавлены:
+- `src/store/slices/notificationsSlice.js`
+- `src/store/slices/uiSlice.js`
 
 Store:
 - `src/store/index.js`
 
-Reducers (2):
-- `notifications` reducer in `src/store/slices/notificationsSlice.js`
-- `ui` reducer in `src/store/slices/uiSlice.js`
+Итог: требование закрыто.
 
-Where values are used:
-- notifications list rendered by `src/components/ToastViewport.jsx`
-- ui values used in products search (`productSearch`) and global operations counter (`operationsCount`)
+### D. Уведомления для auth и CRUD
 
-Result: requirement is fully covered.
-
-### D. Notifications for all auth + CRUD operations (without alert/confirm/prompt)
-
-Implemented global toast notifications:
+Реализованы toast-уведомления:
 - `src/components/ToastViewport.jsx`
 - `src/hooks/useNotify.js`
 
-Auth notifications:
-- `src/pages/LoginPage.jsx` (success/error)
-- `src/pages/RegisterPage.jsx` (success/error)
-- `src/components/Layout.jsx` logout notification
+Итог: требование закрыто.
 
-CRUD notifications:
-- `src/pages/ProductsPage.jsx` (load errors + create/update/delete success/error)
-- `src/pages/CategoriesPage.jsx` (load errors + create/update/delete success/error)
+### E. Подтверждение удаления через модалку
 
-Result: requirement is fully covered.
-
-### E. Delete operations must use modal confirmation (not `confirm()`)
-
-Implemented reusable confirmation modal:
+Используется переиспользуемый компонент:
 - `src/components/ConfirmModal.jsx`
 
-Delete confirmation using modal:
-- products delete in `src/pages/ProductsPage.jsx`
-- categories delete in `src/pages/CategoriesPage.jsx`
+Удаление в продуктах/категориях подтверждается через модальное окно, `window.confirm()` не используется.
 
-No `window.confirm()` used anymore.
-
-Result: requirement is fully covered.
+Итог: требование закрыто.
 
 ---
 
-## 2) File-by-File What Was Added/Changed
+## 2) Основные изменения по файлам
 
-### Frontend Core
-
-- `src/main.jsx`
-  - wrapped app with Redux `<Provider store={store}>`
-  - mounted global `ToastViewport`
-
-- `src/App.jsx`
-  - added admin-only route for `/categories`
-
-- `src/components/ProtectedRoute.jsx`
-  - now supports `roles` prop for role-based protection
-
-- `src/components/Layout.jsx`
-  - shows role and operations counter
-  - admin-only Categories nav link
-  - logout notification
-
-- `src/pages/HomePage.jsx`
-  - admin-only Categories shortcut in UI
-
-### Auth
-
-- `src/context/AuthContext.jsx`
-  - added `normalizeUser` (ensures role fallback)
-  - register now sends/handles role
-  - persisted user is normalized
-
-- `src/pages/LoginPage.jsx`
-  - notification on login success/error
-
-- `src/pages/RegisterPage.jsx`
-  - added role selector (`user`/`admin`) for testing role routing
-  - notification on register success/error
-
-### CRUD UI
-
-- `src/pages/ProductsPage.jsx`
-  - Redux-connected search field
-  - notifications on load/save/delete
-  - delete now uses modal
-  - increments global operations counter on successful create/update/delete
-
-- `src/pages/CategoriesPage.jsx` (new)
-  - full categories CRUD UI
-  - notifications on load/save/delete
-  - delete uses modal
-  - increments global operations counter
-
-### Reusable UI + Hooks
-
-- `src/components/ConfirmModal.jsx` (new)
-- `src/components/ToastViewport.jsx` (new)
-- `src/hooks/useNotify.js` (new)
-
-### Redux
-
-- `src/store/index.js` (new)
-- `src/store/slices/notificationsSlice.js` (new)
-- `src/store/slices/uiSlice.js` (new)
-
-### Backend
-
-- `server/server.js`
-  - added role normalization
-  - user insert now stores `role`
-  - users update endpoint can update role
-  - register endpoint accepts role (defaults are normalized)
-
-- `server/db.json`
-  - existing user now has `"role": "admin"`
-
-### Styles
-
-- `src/App.css`
-  - toast styles
-  - modal styles
-  - search input styles
-  - button variant for destructive confirm action
+- `src/App.jsx`: добавлены маршруты `/admin/products`, `/categories`, `/cart`
+- `src/components/ProtectedRoute.jsx`: защита по ролям
+- `src/pages/ProductsPage.jsx`: каталог только для просмотра + popup товара
+- `src/pages/AdminProductsPage.jsx`: админ-панель CRUD продуктов
+- `src/pages/CategoriesPage.jsx`: CRUD категорий (admin)
+- `src/pages/CartPage.jsx`: корзина пользователя
+- `src/cartStorage.js`: хранение корзины по `userId`
+- `src/components/Layout.jsx`: навигация, счетчик корзины, logout
 
 ---
 
-## 3) How To Run
+## 3) Как запускать
 
-Use two terminals.
+Нужно 2 терминала.
 
 Backend:
 1. `cd server`
@@ -190,46 +94,14 @@ Backend:
 3. `npm run dev`
 
 Frontend:
-1. in project root run `npm install`
-2. run `npm run dev`
-3. open `http://localhost:5173`
+1. в корне проекта: `npm install`
+2. `npm run dev`
+3. открыть `http://localhost:5173`
 
 ---
 
-## 4) How To Demonstrate Requirements in Defense
+## 4) Важно
 
-### Demo 1: Auth + Protected routes
-1. Log out.
-2. Try to open `/products` directly -> redirected to login.
-3. Login -> allowed to access app routes.
-
-### Demo 2: Role-based routing
-1. Register/login as `user`.
-2. Try `/categories` -> blocked and redirected to home.
-3. Register/login as `admin`.
-4. Open `/categories` -> access granted.
-
-### Demo 3: One-to-many CRUD
-1. As admin, create/edit/delete categories in Categories page.
-2. Create/edit/delete products in Products page and assign category.
-3. Show product rows with category mapping.
-
-### Demo 4: Notifications
-1. Perform login/register/logout -> see toast notifications.
-2. Perform create/update/delete in products/categories -> see success toasts.
-3. Trigger API error (stop backend) -> see error toast.
-
-### Demo 5: Delete modal
-1. Click delete on product/category.
-2. Show confirmation modal appears.
-3. Cancel does nothing, confirm deletes.
-4. No browser `confirm()` is used.
-
----
-
-## 5) Important Notes
-
-- Backend uses JSON file storage (`server/db.json`) for educational simplicity.
-- Passwords are still hashed with `bcrypt`.
-- Frontend role checks protect the UI/route behavior for project requirements.
-- For real production security, role checks must also be enforced with token-based auth and server-side authorization middleware.
+- Данные backend хранятся в `server/db.json`.
+- Пароли хешируются через `bcrypt`.
+- Проверка ролей на фронтенде сделана для учебной задачи; в production нужна полноценная серверная авторизация (token + middleware).

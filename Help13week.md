@@ -1,108 +1,108 @@
-# Team Project Final Explanation
+# Финальное описание проекта (13 неделя)
 
-This document explains exactly how the project now satisfies all required points:
+Этот документ показывает, как проект закрывает все требования:
 
-1. one-to-many relation not based on users + CRUD on both tables,
-2. user roles with protected routing for auth and role,
-3. Redux with two reducers,
-4. notifications for auth + CRUD operations without `alert/confirm/prompt`,
-5. modal confirmation for all delete operations.
+1. связь один-ко-многим не через users + CRUD по обеим таблицам;
+2. роли пользователей и защита маршрутов по авторизации и роли;
+3. Redux с двумя редьюсерами;
+4. уведомления для auth и CRUD без `alert/confirm/prompt`;
+5. подтверждение удаления через модальные окна.
 
 ---
 
-## 1) Requirements Checklist
+## 1) Чеклист требований
 
-### A. One-to-many relation (not users) + CRUD on both tables
+### A. Связь один-ко-многим (не users) + CRUD по обеим таблицам
 
-Implemented relation:
+Реализованная связь:
 - `categories (1) -> products (many)` via `product.categoryId`.
 
-Backend CRUD:
+CRUD в backend:
 - categories: `GET /categories`, `GET /categories/:id`, `POST /categories`, `PUT /categories/:id`, `DELETE /categories/:id`
 - products: `GET /products`, `GET /products/:id`, `POST /products`, `PUT /products/:id`, `DELETE /products/:id`
 
-Frontend CRUD pages:
+CRUD в frontend:
 - `src/pages/AdminProductsPage.jsx` (full product CRUD, admin-only)
 - `src/pages/CategoriesPage.jsx` (full categories CRUD, admin-only)
 - `src/pages/ProductsPage.jsx` (catalog/read-only for logged users)
 
-Result: requirement is fully covered on both sides.
+Итог: требование полностью закрыто.
 
-### B. Roles + protected routes by auth and role
+### B. Роли + защита маршрутов по авторизации и роли
 
-Roles:
+Роли:
 - users now include `role` with at least two values: `admin`, `user`.
 - backend normalizes role in `server/server.js`.
 - existing seed user in `server/db.json` is set to `admin`.
 
-Protection:
+Защита:
 - logged/not logged protection: `src/components/ProtectedRoute.jsx`
 - role protection: same component supports `roles` prop and blocks access if user role is not allowed.
 
-Role-based routes:
+Маршруты по ролям:
 - `src/App.jsx`:
   - `/categories` is protected with `roles={['admin']}`
   - `/admin/products` is protected with `roles={['admin']}`
   - `/products` is a normal logged-in catalog route without edit/delete
   - all internal routes still require login first
 
-Role-based UI:
+UI по ролям:
 - `src/components/Layout.jsx` and `src/pages/HomePage.jsx` show `Manage Products` + `Categories` links only for admin.
 
-Result: requirement is fully covered.
+Итог: требование полностью закрыто.
 
-### C. Redux with 2 reducers
+### C. Redux с 2 редьюсерами
 
-Added Redux Toolkit + React Redux.
+Добавлены Redux Toolkit + React Redux.
 
 Store:
 - `src/store/index.js`
 
-Reducers (2):
+Редьюсеры (2):
 - `notifications` reducer in `src/store/slices/notificationsSlice.js`
 - `ui` reducer in `src/store/slices/uiSlice.js`
 
-Where values are used:
+Где используются значения:
 - notifications list rendered by `src/components/ToastViewport.jsx`
 - ui values used in products search (`productSearch`) and global operations counter (`operationsCount`)
 
-Result: requirement is fully covered.
+Итог: требование полностью закрыто.
 
-### D. Notifications for all auth + CRUD operations (without alert/confirm/prompt)
+### D. Уведомления для всех auth + CRUD операций (без alert/confirm/prompt)
 
-Implemented global toast notifications:
+Реализованы глобальные toast-уведомления:
 - `src/components/ToastViewport.jsx`
 - `src/hooks/useNotify.js`
 
-Auth notifications:
+Уведомления auth:
 - `src/pages/LoginPage.jsx` (success/error)
 - `src/pages/RegisterPage.jsx` (success/error)
 - `src/components/Layout.jsx` logout notification
 
-CRUD notifications:
+Уведомления CRUD:
 - `src/pages/AdminProductsPage.jsx` (load errors + create/update/delete success/error)
 - `src/pages/CategoriesPage.jsx` (load errors + create/update/delete success/error)
 
-Result: requirement is fully covered.
+Итог: требование полностью закрыто.
 
-### E. Delete operations must use modal confirmation (not `confirm()`)
+### E. Подтверждение удаления через модальное окно (не `confirm()`)
 
-Implemented reusable confirmation modal:
+Реализован переиспользуемый modal-компонент:
 - `src/components/ConfirmModal.jsx`
 
-Delete confirmation using modal:
+Подтверждение удаления через modal:
 - products delete in `src/pages/AdminProductsPage.jsx`
 - categories delete in `src/pages/CategoriesPage.jsx`
 
 No `window.confirm()` used anymore.
 
-Result: requirement is fully covered.
+Итог: требование полностью закрыто.
 
 ---
 
-## 2) File-by-File What Was Added/Changed
+## 2) Что добавлено/изменено по файлам
 
-### Frontend Core
+### Frontend (основа)
 
 - `src/main.jsx`
   - wrapped app with Redux `<Provider store={store}>`
@@ -123,7 +123,7 @@ Result: requirement is fully covered.
 - `src/pages/HomePage.jsx`
   - admin-only shortcuts for `Manage Products` and `Categories`
 
-### Auth
+### Авторизация (Auth)
 
 - `src/context/AuthContext.jsx`
   - added `normalizeUser` (ensures role fallback)
@@ -156,7 +156,7 @@ Result: requirement is fully covered.
   - delete uses modal
   - increments global operations counter
 
-### Reusable UI + Hooks
+### Переиспользуемые UI-компоненты и хуки
 
 - `src/components/ConfirmModal.jsx` (new)
 - `src/components/ToastViewport.jsx` (new)
@@ -179,7 +179,7 @@ Result: requirement is fully covered.
 - `server/db.json`
   - existing user now has `"role": "admin"`
 
-### Styles
+### Стили
 
 - `src/App.css`
   - toast styles
@@ -190,9 +190,9 @@ Result: requirement is fully covered.
 
 ---
 
-## 3) How To Run
+## 3) Как запускать
 
-Use two terminals.
+Нужны два терминала.
 
 Backend:
 1. `cd server`
@@ -206,64 +206,64 @@ Frontend:
 
 ---
 
-## 4) How To Demonstrate Requirements in Defense
+## 4) Как показать требования на защите
 
-### Demo 1: Auth + Protected routes
-1. Log out.
-2. Try to open `/products` directly -> redirected to login.
-3. Login -> allowed to access app routes.
+### Демо 1: Auth + Protected routes
+1. Выйдите из аккаунта.
+2. Откройте `/products` напрямую -> редирект на login.
+3. Войдите в систему -> маршруты становятся доступными.
 
-### Demo 2: Role-based routing
-1. Register/login as `user`.
-2. Try `/categories` -> blocked and redirected to home.
-3. Register/login as `admin`.
-4. Open `/categories` -> access granted.
+### Демо 2: Маршрутизация по ролям
+1. Зарегистрируйтесь/войдите как `user`.
+2. Откройте `/categories` -> доступ запрещен, редирект на home.
+3. Зарегистрируйтесь/войдите как `admin`.
+4. Откройте `/categories` -> доступ разрешен.
 
-### Demo 3: One-to-many CRUD
-1. As admin, create/edit/delete categories in Categories page.
-2. Create/edit/delete products in `Manage Products` page and assign category.
-3. Open user `Products` page and show catalog cards with category mapping.
+### Демо 3: CRUD для связи один-ко-многим
+1. Как admin создайте/измените/удалите категории на странице Categories.
+2. Создайте/измените/удалите продукты на странице `Manage Products`, привяжите категорию.
+3. Откройте пользовательскую страницу `Products` и покажите карточки каталога с категорией.
 
-### Demo 4: Notifications
-1. Perform login/register/logout -> see toast notifications.
-2. Perform create/update/delete in products/categories -> see success toasts.
-3. Trigger API error (stop backend) -> see error toast.
+### Демо 4: Уведомления
+1. Выполните login/register/logout -> появятся toast-уведомления.
+2. Выполните create/update/delete в products/categories -> появятся success toasts.
+3. Вызовите ошибку API (остановите backend) -> появится error toast.
 
-### Demo 5: Delete modal
-1. Click delete on product/category.
-2. Show confirmation modal appears.
-3. Cancel does nothing, confirm deletes.
-4. No browser `confirm()` is used.
+### Демо 5: Модальное подтверждение удаления
+1. Нажмите delete у продукта/категории.
+2. Покажите, что открывается модальное окно подтверждения.
+3. Cancel ничего не удаляет, Confirm удаляет запись.
+4. `confirm()` браузера не используется.
 
-### Demo 6: Catalog vs Admin panel split
-1. Login as `user` and open `/products` -> see catalog only.
-2. Confirm user cannot access `/admin/products`.
-3. Login as `admin` and open `/admin/products` -> full CRUD panel appears.
+### Демо 6: Разделение каталога и админ-панели
+1. Войдите как `user` и откройте `/products` -> только каталог.
+2. Убедитесь, что `user` не может открыть `/admin/products`.
+3. Войдите как `admin` и откройте `/admin/products` -> доступна полная CRUD-панель.
 
 ---
 
-## 5) Important Notes
+## 5) Важные замечания
 
 - Backend uses JSON file storage (`server/db.json`) for educational simplicity.
 - Passwords are still hashed with `bcrypt`.
 - Frontend role checks protect the UI/route behavior for project requirements.
 - For real production security, role checks must also be enforced with token-based auth and server-side authorization middleware.
 
-### Troubleshooting: "I created admin but cannot manage"
+### Troubleshooting: "создал admin, но не могу управлять"
 
 If an account exists in `server/db.json` without a `role` field, frontend fallback treats it as `user`, so admin pages stay locked.
 
-Fix:
-1. Open `server/db.json`.
-2. Add `"role": "admin"` to that user record.
-3. Restart backend server (`cd server` -> `npm run dev`).
-4. Log out and log in again.
+Как исправить:
+1. Откройте `server/db.json`.
+2. Добавьте `"role": "admin"` в запись нужного пользователя.
+3. Перезапустите backend (`cd server` -> `npm run dev`).
+4. Выйдите из аккаунта и войдите снова.
 
 ---
 
-## 6) New Feature: Product Popup + Per-User Cart
+## 6) Новая функция: popup товара + корзина для каждого пользователя
 
-### What was added
+### Что добавлено
 
 - Product cards now open a popup modal with details and quantity input.
 - Popup contains `Add to cart` action.
@@ -271,26 +271,26 @@ Fix:
 - Added a dedicated cart page with quantity update, remove item, clear cart, and total.
 - Navigation now includes cart link with live item count.
 
-### Routes
+### Маршруты
 
 - `GET UI /products`: catalog view for browsing and opening product popup.
 - `GET UI /cart`: cart page for current logged user.
 
-### Per-user storage logic
+### Логика хранения корзины по пользователю
 
-Cart storage key format:
+Формат ключа корзины:
 - `teamproject_cart_user_<userId>`
 
-This guarantees:
+Это гарантирует:
 - User A cart is separate from User B cart.
 - Logging in with another account shows that account's own cart.
 
-### Files added
+### Новые файлы
 
 - `src/cartStorage.js` - reusable cart read/write/add helpers.
 - `src/pages/CartPage.jsx` - cart UI page.
 
-### Files updated
+### Обновленные файлы
 
 - `src/pages/ProductsPage.jsx`
   - added popup modal for product details
@@ -306,11 +306,11 @@ This guarantees:
 - `src/App.css`
   - styles for cart quantity input/footer and popup quantity block
 
-### How to demo
+### Как показать на защите
 
-1. Log in as any user.
-2. Open `/products`.
-3. Click `View details` on a product.
-4. Select quantity and click `Add to cart`.
-5. Open `/cart` and confirm item appears with correct subtotal/total.
-6. Log out, log in as a different user, and confirm cart is different (per-user persistence).
+1. Войдите под любым пользователем.
+2. Откройте `/products`.
+3. Нажмите `View details` у товара.
+4. Выберите количество и нажмите `Add to cart`.
+5. Откройте `/cart` и проверьте корректные subtotal/total.
+6. Выйдите, войдите под другим пользователем и убедитесь, что корзина другая (персональная).
